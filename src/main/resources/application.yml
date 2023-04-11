@@ -14,7 +14,7 @@ spring:
 
   # 配置 redis
   redis:
-    host: localhost   #虚拟机服务器 ip
+    host: 192.168.86.100   #虚拟机服务器 ip
     port: 6379        #端口号
     password: 123456  #密码，没设可以不要
     database: 0       #操作的是 0 号数据库
