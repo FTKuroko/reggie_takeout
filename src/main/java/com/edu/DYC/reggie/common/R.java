@@ -2,6 +2,7 @@ package com.edu.DYC.reggie.common;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  */
 // 返回结果类。此类是一个通用结果类，服务端相应的所有结果最终都会包装成此种类型返回给前端页面
 @Data
-public class R<T> {
+public class R<T> implements Serializable {
     // 编码：1成功，0和其他数字为失败
     private Integer code;
     // 错误信息

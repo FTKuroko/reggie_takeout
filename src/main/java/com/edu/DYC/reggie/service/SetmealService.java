@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.edu.DYC.reggie.entity.Setmeal;
 import com.edu.DYC.reggie.vo.SetmealDto;
 
+import java.util.List;
+
 /**
  * @author :   Kuroko
  * @date :     2023/2/24
@@ -18,4 +20,6 @@ public interface SetmealService extends IService<Setmeal> {
 
     // 修改套餐
     public void updateWithDish(SetmealDto setmealDto);
+
+    public void removeWithDish(List<Long> ids);
 }

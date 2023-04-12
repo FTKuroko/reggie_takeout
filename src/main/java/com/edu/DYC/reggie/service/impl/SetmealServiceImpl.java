@@ -92,4 +92,20 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
         setmealDishService.saveBatch(setmealDishes);
     }
+
+    @Override
+    public void removeWithDish(List<Long> ids) {
+        // 先判断能不能删除，判断套餐状态
+        LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealLambdaQueryWrapper.in(Setmeal::getId, ids);
+        setmealLambdaQueryWrapper.eq(Setmeal::getStatus, 1);
+        int count = this.count(setmealLambdaQueryWrapper);
+
+        // 如果没有在售套餐，直接删除
+        this.removeByIds(ids);
+        // 继续删除
+        LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        setmealDishLambdaQueryWrapper.in(SetmealDish::getSetmealId, ids);
+        setmealDishService.remove(setmealDishLambdaQueryWrapper);
+    }
 }

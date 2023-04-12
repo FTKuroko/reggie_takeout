@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,6 +43,7 @@ public class SetmealController {
     private CategoryService categoryService;
 
     @PostMapping
+    @CacheEvict(value = "setmealCache", allEntries = true)
     public R<String> save(@RequestBody SetmealDto setmealDto){
         log.info("setmeal:{}", setmealDto);
         setmealService.saveWithDish(setmealDto);
@@ -95,26 +98,10 @@ public class SetmealController {
      * @return
      */
     @DeleteMapping
-    public R<String> delete(String[] ids){
-        int index = 0;
-
-        for(String id : ids){
-            // 根据 id 找到对应的套餐
-            Setmeal setmeal = setmealService.getById(id);
-            // 判断当前套餐是否还在售卖
-            if(setmeal.getStatus() != 1){
-                // 删除
-                setmealService.removeById(id);
-            }else{
-                index++;
-            }
-        }
-
-        if(index > 0 && index == ids.length){
-            return R.error("选中的套餐均为启售状态，不能删除"); // 为什么要判断所有选中的套餐呢？
-        }else{
-            return R.success("删除成功");
-        }
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info("需要删除的套餐 id 为：{}", ids);
+        setmealService.removeWithDish(ids);
+        return R.success("删除成功");
     }
 
     /**
@@ -151,6 +138,7 @@ public class SetmealController {
      * @return
      */
     @PutMapping
+    @CacheEvict(value = "setmealCache", allEntries = true)
     public R<String> update(@RequestBody SetmealDto setmealDto){
         setmealService.updateWithDish(setmealDto);
         return R.success("修改成功");
@@ -162,6 +150,7 @@ public class SetmealController {
      * @return
      */
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache", key = "#setmeal.categoryId + '_' + #setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal){
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
